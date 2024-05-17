@@ -12,11 +12,9 @@ type Props = { goToHomeScreen: () => void; callId: number; agentId: string };
 
 export const CallScreen = ({ goToHomeScreen, callId, agentId }: Props) => {
   const [call, setCall] = React.useState<Call | null>(null);
-  const [members, setMembers] = React.useState([{ user_id: "cuidador26" }, { user_id: "web4" }]);
   const client = useStreamVideoClient();
 
   useEffect(() => {
-    console.log("members", members);
     const call = client.call("default", callId.toString());
     call
       .getOrCreate({
@@ -24,14 +22,17 @@ export const CallScreen = ({ goToHomeScreen, callId, agentId }: Props) => {
         data: { members: [{ user_id: "cuidador26" }, { user_id: "web4" }] },
       })
       .then(() => setCall(call));
-  }, [client, members]);
+  }, [client]);
 
-  const addMember = async (newMemberId) => {
+  const addMember = async (newMemberId: string) => {
     if (call) {
       await call.updateCallMembers({
-        update_members: [{ user_id: newMemberId },{ user_id: "cuidador26" }, { user_id: "web4" }],
+        update_members: [
+          { user_id: newMemberId },
+          { user_id: "cuidador26" },
+          { user_id: "web4" },
+        ],
       });
-      // setMembers([...members, { user_id: newMemberId }]);
     }
   };
 
@@ -50,10 +51,7 @@ export const CallScreen = ({ goToHomeScreen, callId, agentId }: Props) => {
             goToHomeScreen(), call.endCall();
           }}
         />
-        <Button
-          title="Add Member"
-          onPress={() => addMember("paciente12")}
-        />
+        <Button title="Add Member" onPress={() => addMember("paciente12")} />
         <CallContent onHangupCallHandler={goToHomeScreen} />
       </View>
     </StreamCall>
